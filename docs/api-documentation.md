@@ -1,6 +1,6 @@
-# VaultUI Bank API Documentation
+# Axiom Bank API Documentation
 
-Welcome to the API Documentation for VaultUI Banking System. The API uses RESTful principles and is secured by JSON Web Tokens (JWT).
+Welcome to the API Documentation for Axiom Banking System. The API uses RESTful principles and is secured by JSON Web Tokens (JWT).
 
 ## Base URL
 `/api`

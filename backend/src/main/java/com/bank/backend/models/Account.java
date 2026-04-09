@@ -39,6 +39,7 @@ public class Account {
     public void setAccountType(String accountType) { this.accountType = accountType; }
     public BigDecimal getBalance() { return balance; }
     public void setBalance(BigDecimal balance) { this.balance = balance; }
+    @JsonIgnore
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     public String getStatus() { return status; }

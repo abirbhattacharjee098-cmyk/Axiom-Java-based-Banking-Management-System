@@ -14,7 +14,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand">
-        <span className="text-gradient">VaultUI</span> Bank
+        <span className="text-gradient">Axiom</span> Bank
       </Link>
       
       <div className="navbar-links">

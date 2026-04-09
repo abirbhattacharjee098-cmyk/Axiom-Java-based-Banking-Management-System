@@ -1,6 +1,6 @@
-# VaultUI Bank - Full-Stack Banking Management System
+# Axiom Bank - Full-Stack Banking Management System
 
-VaultUI Bank is a production-ready, full-stack Banking Management System architected for secure financial operations. 
+Axiom Bank is a production-ready, full-stack Banking Management System architected for secure financial operations. 
 Built using enterprise-grade technologies, it integrates a robust Spring Boot backend with a highly dynamic React frontend, seamlessly containerized with Docker.
 
 ## Project Architecture
