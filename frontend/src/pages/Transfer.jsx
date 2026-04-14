@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
 export default function Transfer() {
   const [accounts, setAccounts] = useState([]);
+  const [beneficiaries, setBeneficiaries] = useState([]);
   const [formData, setFormData] = useState({ sourceAccountId: '', destinationAccountId: '', amount: '', type: 'TRANSFER' });
   const [message, setMessage] = useState('');
+  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
+  const [beneName, setBeneName] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,6 +17,7 @@ export default function Transfer() {
       setAccounts(res.data);
       if(res.data.length > 0) setFormData(f => ({...f, sourceAccountId: res.data[0].id}));
     });
+    api.get('/beneficiaries').then(res => setBeneficiaries(res.data));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -25,6 +30,9 @@ export default function Transfer() {
         await api.post('/transactions/withdraw', { sourceAccountId: formData.sourceAccountId, amount: formData.amount });
       } else {
         await api.post('/transactions/transfer', formData);
+        if (saveBeneficiary && beneName) {
+           await api.post('/beneficiaries', { name: beneName, accountNumber: formData.destinationAccountId });
+        }
       }
       setMessage('Transaction successful!');
       setTimeout(() => navigate('/dashboard'), 1500);
@@ -58,10 +66,36 @@ export default function Transfer() {
           </div>
 
           {formData.type === 'TRANSFER' && (
-            <div className="input-group">
-              <label>Destination Account ID</label>
-              <input className="input-field" type="number" placeholder="Enter target account ID" value={formData.destinationAccountId} onChange={e => setFormData({...formData, destinationAccountId: e.target.value})} required />
-            </div>
+            <>
+              {beneficiaries.length > 0 && (
+                <div className="input-group">
+                  <label>Quick Select Beneficiary</label>
+                  <select className="input-field" onChange={e => setFormData({...formData, destinationAccountId: e.target.value})}>
+                    <option value="">-- Choose saved beneficiary --</option>
+                    {beneficiaries.map(b => <option key={b.id} value={b.accountNumber}>{b.name} ({b.accountNumber})</option>)}
+                  </select>
+                </div>
+              )}
+              
+              <div className="input-group">
+                <label>Destination Account ID</label>
+                <input className="input-field" type="text" placeholder="Enter target account ID" value={formData.destinationAccountId} onChange={e => setFormData({...formData, destinationAccountId: e.target.value})} required />
+              </div>
+
+              {!beneficiaries.find(b => b.accountNumber === formData.destinationAccountId) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                  <input type="checkbox" id="saveBene" checked={saveBeneficiary} onChange={e => setSaveBeneficiary(e.target.checked)} />
+                  <label htmlFor="saveBene" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '14px', cursor: 'pointer' }}><Star size={14} /> Save as Beneficiary</label>
+                </div>
+              )}
+              
+              {saveBeneficiary && (
+                <div className="input-group">
+                  <label>Beneficiary Name</label>
+                  <input className="input-field" type="text" placeholder="E.g. John Doe" value={beneName} onChange={e => setBeneName(e.target.value)} required={saveBeneficiary} />
+                </div>
+              )}
+            </>
           )}
 
           <div className="input-group">

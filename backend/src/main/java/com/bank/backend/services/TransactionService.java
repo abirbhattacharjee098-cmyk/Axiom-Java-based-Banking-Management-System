@@ -1,11 +1,13 @@
 package com.bank.backend.services;
 
+import com.bank.backend.events.TransactionCreatedEvent;
 import com.bank.backend.models.Account;
 import com.bank.backend.models.Transaction;
 import com.bank.backend.repository.AccountRepository;
 import com.bank.backend.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,12 @@ public class TransactionService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private ForexService forexService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Transaction> getTransactionsForAccount(Long accountId) {
         return transactionRepository.findBySourceAccountIdOrDestinationAccountIdOrderByTimestampDesc(accountId, accountId);
@@ -63,7 +71,10 @@ public class TransactionService {
         }
 
         source.setBalance(source.getBalance().subtract(amount));
-        target.setBalance(target.getBalance().add(amount));
+        
+        // Convert amount if currencies differ
+        BigDecimal convertedAmount = forexService.convert(amount, source.getCurrency(), target.getCurrency());
+        target.setBalance(target.getBalance().add(convertedAmount));
 
         accountRepository.save(source);
         accountRepository.save(target);
@@ -78,12 +89,12 @@ public class TransactionService {
         transaction.setDestinationAccountId(targetId);
         transaction.setAmount(amount);
         transaction.setType(type);
-        
-        // Basic Fraud Detection Logic
-        if (amount.compareTo(new BigDecimal("10000")) > 0) {
-            transaction.setSuspicious(true);
-        }
 
-        return transactionRepository.save(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+
+        // Publish event for async fraud detection
+        eventPublisher.publishEvent(new TransactionCreatedEvent(this, saved));
+
+        return saved;
     }
 }

@@ -6,48 +6,45 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "accounts")
-public class Account {
+@Table(name = "loans")
+public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(unique = true, nullable = false)
-    private String accountNumber;
-
-    @Column(nullable = false)
-    private String accountType; // SAVINGS, CURRENT
-
-    private BigDecimal balance = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
-    private String status = "ACTIVE";
+    @Column(nullable = false)
+    private BigDecimal principal;
 
-    private String currency = "USD";
+    @Column(nullable = false)
+    private BigDecimal interestRate; // e.g. 10.5
+
+    @Column(nullable = false)
+    private Integer durationMonths;
+
+    private String status = "PENDING"; // PENDING, APPROVED, REJECTED, PAID
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Account() {}
+    public Loan() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
-    public String getAccountType() { return accountType; }
-    public void setAccountType(String accountType) { this.accountType = accountType; }
-    public BigDecimal getBalance() { return balance; }
-    public void setBalance(BigDecimal balance) { this.balance = balance; }
     @JsonIgnore
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    public BigDecimal getPrincipal() { return principal; }
+    public void setPrincipal(BigDecimal principal) { this.principal = principal; }
+    public BigDecimal getInterestRate() { return interestRate; }
+    public void setInterestRate(BigDecimal interestRate) { this.interestRate = interestRate; }
+    public Integer getDurationMonths() { return durationMonths; }
+    public void setDurationMonths(Integer durationMonths) { this.durationMonths = durationMonths; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-    public String getCurrency() { return currency; }
-    public void setCurrency(String currency) { this.currency = currency; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

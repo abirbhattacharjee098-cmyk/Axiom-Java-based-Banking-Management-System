@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Transfer from './pages/Transfer';
 import AdminDashboard from './pages/AdminDashboard';
+import Loans from './pages/Loans';
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { user } = React.useContext(AuthContext);
@@ -42,6 +43,12 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute requireAdmin={true}>
               <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/loans" element={
+            <ProtectedRoute>
+              <Loans />
             </ProtectedRoute>
           } />
         </Routes>
